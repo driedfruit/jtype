@@ -110,8 +110,8 @@ var JType = {
 	iframesCounter : 0,
 	ajaiObject : function () {
 		var o = new Object();
-		o = Prototype(o, JType.JQueryAjaiPrototype);
-		o = Prototype(o, JType.JQueryAjaxPrototype);
+		o = JType.extend(o, JType.JQueryAjaiPrototype);
+		o = JType.extend(o, JType.JQueryAjaxPrototype);
 		return o;
 	},
 
@@ -128,7 +128,7 @@ var JType = {
 				} catch (e) {}
 			}
 		}
-		if (o) o = Prototype(o, JType.JQueryAjaxPrototype);
+		if (o) o = JType.extend(o, JType.JQueryAjaxPrototype);
 		return o;
 	},
 
@@ -192,7 +192,7 @@ var JType = {
 	},
 
 	ajaiSubmit : function (form, params) {
-		var ajax = Prototype(JType.ajaiObject(), params);
+		var ajax = JType.extend(JType.ajaiObject(), params);
 
 		ajax.open();
 
@@ -227,11 +227,11 @@ var JType = {
 
 	ajaxSubmit : function (form, _params) {
 
-		var params = Prototype( JType.ajaxForm(form) , _params );
+		var params = JType.extend( JType.ajaxForm(form) , _params );
 
 		if (params["iframe"]) return JType.ajaiSubmit(form, params);
 
-		var ajax = Prototype(JType.ajaxObject(), params );
+		var ajax = JType.extend(JType.ajaxObject(), params);
 
 		ajax.request();
 
@@ -240,7 +240,7 @@ var JType = {
 
 	ajaxRun : function (params) {
 
-		var ajax = Prototype(
+		var ajax = JType.extend(
 			(params["iframe"] ? JType.ajaiObject() : JType.ajaxObject()), params );
 
 		ajax.request();
@@ -287,24 +287,21 @@ var JType = {
 		return classRegExps[name];
 	},
 
+	extend: function(target, object1) {
+		for (var key in object1) {
+			try {
+				target[key] = object1[key];
+			}
+			catch (e) {
+				console.log("Unable to set ", target);
+				target[key] = null;
+			}
+			//console.log(key + " = "+proto[key]);
+		}
+		return target;
+	},
+
 	JQueryNodePrototype: {
-
-		register : function () {
-
-		},
-
-		//each : function (calee) {
-		//	calee.call(this, 0, this);
-		//	return this;
-		//},
-
-		//uid : function () {
-		//	var current = this.getAttribute('data-jtype-uid');
-		//	if (current) return current;
-		//	else current = JType.uids++;
-		//	this.setAttribute('data-jtype-uid', current);
-		//	return current;
-		//},
 
 		on : function (type, middle_arg, callback) {
 
@@ -480,7 +477,7 @@ var JType = {
 				for (var i = 0; i < this.length; i++) {
 					ret[i] = JType.JQueryNodePrototype[name].call(this[i], arg1, arg2, arg3);
 				}
-				return Prototype( ret, JType.JQueryListPrototype );
+				return JType.extend( ret, JType.JQueryListPrototype );
 			}
 		}
 		function iterFunc(name) {
@@ -502,13 +499,6 @@ var JType = {
 	},
 
 	JQueryListPrototype: {
-
-		register : function () {
-			for (var i = 0; i < this.length; i++) {
-				//this[i] = Prototype(this[i], JType.JQueryNodePrototype);
-			}
-			return this;
-		},
 
 		//eachExec : function(name, arg1, arg2, arg3) {
 		// for (var i = 0; i < this.length; i++) {
@@ -668,7 +658,7 @@ var JType = {
 			}
 
 		},
-		
+
 		setRequestHeader: function(name, value) {
 			if (name == 'Accept') {
 				//not ever called for some reason...?
@@ -679,94 +669,57 @@ var JType = {
 			}
 			this.headers[ name.toUpperCase() ] = value;
 		}
+	},
+
+	$: function(arg, arg2) {
+
+		//console.log("JQuery with arg " + typeof arg, arg);
+		if (arg === document) {
+			return JType.extend(arg, JType.JQueryDocumentPrototype);
+		}
+
+		else if (typeof arg === 'object') {
+			//wrap object
+			return JType.extend( [ arg ], JType.JQueryListPrototype );
+		}
+
+		else if (typeof arg === 'string') {
+			//create
+			if (arg.substr(0, 1) == '<' && arg.substr(arg.length-1, 1) == '>') { //IE substr negative :/
+				return JType.extend( JType.createNode( arg, arg2 ), JType.JQueryListPrototype );
+			}
+			//select
+			return JType.extend( JType.SelEng( arg, arg2 ), JType.JQueryListPrototype );
+		}
+
+		else if (typeof arg === 'function') {
+			return JType.$(document).ready(arg);
+		}
+
+		else if (typeof arg === 'undefined') {
+			return JType.$(document);
+		}
+
+		else {
+			console.log("Undefined argument type " + typeof arg);
+		}
+
 	}
 
 };
 
 function $ (arg, arg2) {
 
-	return JQuery(arg, arg2);
-
-}
-
-function JQuery (arg, arg2) {
-	//console.log("JQuery with arg " + typeof arg, arg);
-	if (arg === document) {
-		return Prototype(arg, JType.JQueryDocumentPrototype);
-	}
-
-	else if (typeof arg === 'object') {
-		//wrap object
-		return Prototype( [ arg ], JType.JQueryListPrototype );
-	} 
-
-	else if (typeof arg === 'string') {
-		//create
-		if (arg.substr(0, 1) == '<' && arg.substr(arg.length-1, 1) == '>') { //IE substr negative :/
-			return Prototype( JType.createNode( arg, arg2 ), JType.JQueryListPrototype );
-		}
-		//select
-		return Prototype( JType.SelEng( arg, arg2 ), JType.JQueryListPrototype );
-	}
-
-	else if (typeof arg === 'function') {
-		JQuery(document).ready(arg);
-	}
-
-	else if (typeof arg === 'undefined') {
-		return JQuery(document);
-	}
-
-	else {
-		console.log("Undefined argument type " + typeof arg);
-	}
+	return JType.$(arg, arg2);
 
 }
 
 function $$ (arg, proto) {
 
-	return Prototype(arg, proto);
+	return JType.extend(arg, proto);
 
 }
 
-function Prototype (arg, proto) {
-
-	/* List of objects */
-	if (arg.length) {
-		for (var i in arg) {
-			//alert('one object is ' + arg[i]);
-			//Prototype(arg, proto);
-		}
-	}
-
-//	if (arg.length == 1) {
-	//	arg = arg[0];
-//	}
-
-	//alert('proto:' + arg + '('+typeof arg+')'+arg.length);
-
-	for (var key in proto) {
-
-		try {
-			arg[key] = proto[key];
-		}
-		catch (e) {
-			console.log("Unable to set ", arg);
-			arg[key] = null;
-		}
-
-		//console.log(key + " = "+proto[key]);
-
-	}
-
-	if (proto.register && typeof proto.register === 'function') {
-
-		arg.register();
-
-	}
-
-	return arg;
-}
 
 if (!window.console) {
 	console = {

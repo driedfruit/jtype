@@ -71,11 +71,11 @@ This function could be used multiple times.
 
 `$( selector [, base] )`
 
-`JQuery( selector [, base] )`
+`JType.$( selector [, base] )`
 
-_Yes, there's a function called `JQuery` (sorry about that), and an alias, called `$`._
+_Yes, there's a function called `$`, which will be in conflict with i.e. jQuery._
 
-Returns an array of items selected by `selector`, from optional `base` element. 
+Returns an array of items selected by `selector`, from optional `base` element.
 If `base` is not specified, `document` is used.
 
 ```js
@@ -96,9 +96,10 @@ Creates new DOM elements by taking HTML string for an argument.
 
 `$$( object, prototype )`
 
-`Prototype( object, prototype )`
+`JType.extend( object, prototype )`
 
-_Yes, there's a function called `Prototype` (sorry about that too), and an alias, called `$$`._
+_Yes, there's a function called `$$`, which will be in conflict with
+i.e. Prototype._
 
 Assigns each enumerable property of object `prototype` to object `object`.
 
