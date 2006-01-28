@@ -83,6 +83,27 @@ If `base` is not specified, `document` is used.
 	var links = $('a');
 ```
 
+#### Match
+
+`.matches( selector )`
+
+Performs a selector test against an element.
+
+```js
+	if ($('a').matches('.active'))
+		//has class!
+```
+
+#### Closest parent
+
+`.closest( selector [, base] )`
+
+Finds closest parent (beginning with this node).
+
+```js
+	var fig = $('img').closest('figure')
+```
+
 #### Create
 
 Creates new DOM elements by taking HTML string for an argument.
@@ -110,6 +131,14 @@ Assigns each enumerable property of object `prototype` to object `object`.
 ```
 
 Returns `object`, for chaining.
+
+### Classes
+
+`.hasClass( name )`
+`.addClass( name )`
+`.removeClass( name )`
+
+Tests, adds or removes a class from element's class list.
 
 ### Iterate
 
