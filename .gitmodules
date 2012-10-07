@@ -1,0 +1,12 @@
+[submodule "seleng/sizzle"]
+	path = seleng/sizzle
+	url = git://github.com/jquery/sizzle.git
+[submodule "seleng/nwmatcher"]
+	path = seleng/nwmatcher
+	url = git://github.com/dperini/nwmatcher.git
+[submodule "seleng/sly"]
+	path = seleng/sly
+	url = git://github.com/digitarald/sly.git
+[submodule "seleng/peppy"]
+	path = seleng/peppy
+	url = git://github.com/jdonaghue/Peppy.git
