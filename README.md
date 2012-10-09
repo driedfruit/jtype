@@ -3,7 +3,7 @@
 A tiny javascript framework, that borrows it's syntax from JQuery and 
 Prototype.
 
-In only 10kb (about 500 lines of code), it can provide an onDOMload method, 
+In only 13kb (about 550 lines of code), it can provide an onDOMload method, 
 AJAX (both true and iframe-based), `.each` iterator and an event binder/unbinder. 
 
 JType should also be able to "emulate" JQuery, for cases when you need
@@ -28,11 +28,10 @@ limited to CSS2.1 selectors). See the link to get the most up-to-date stats.
 
 ## Usage
 
-```sh
 	git submodule init
 	git submodule update
 	make
-```
+
 Will give you the .js files with versions containting different selector engines,
 
     jtype-sizzle-0.0.1.js
@@ -53,10 +52,25 @@ And invoke JType's functions.
 
 ## Functions
 
+### Initialize
+
+`$(document).ready( callback )`
+
+Fire `callback` function on DOM load event.
+
+```js
+	$(document).ready( function() {
+		alert('DOM loaded!');
+	});
+```
+
+This function could be used multiple times.
+
 ### Select
 
-`$(selector[, base])`
-`JQuery(selector[, base])`
+`$( selector [, base] )`
+
+`JQuery( selector [, base] )`
 
 _Yes, there's a function called `JQuery` (sorry about that), and an alias, called `$`._
 
@@ -68,10 +82,11 @@ element. If `base` is not specified, `document` is used.
 	var links = $('a');
 ```
 
-### Expand	
+### Extend	
 
-`$$(object, prototype)`
-`Prototype(object, prototype)`
+`$$( object, prototype )`
+
+`Prototype( object, prototype )`
 
 _Yes, there's a function called `Prototype` (sorry about that too), and an alias, called `$$`._
 
@@ -87,33 +102,41 @@ Returns `object`, for chaining.
 
 ### Iterate
 
-`each( callback )`
+`.each( callback )`
 
-Iterates through an array of objects and calls `callback` for each of them.
+Iterates through an array of objects and calls `callback` for each one.
 ```js
 	//change each link's text in a document
 	$('a').each(function() {
 		this.innerHTML = "A link";
 	});
 ```
- 
-### Initialize
 
-`$(document).ready( callback )`
+Callback function is called from the object context, so `this` always refers 
+the object being iterated over.
 
-Fire `callback` function on DOM load event.
+Callback function may accept 2 arguments - current iteration `index` and
+ current `element`.
+
+If your callback function returns `false`, the iteration loop is broken out of.
 
 ```js
-	$(document).ready( function() {
-		alert('DOM loaded!');
+	//use verbose callback
+	$('a').each(function(index, element) {
+		element.innerHTML = "A link, number " + index;
+
+		//only handle first two links
+		if (index > 1) return false;
 	});
 ```
 
-This function could be used multiple time.
+### Add handlers
 
-### Handle
+`.on( type [, selector ], callback )`
 
-`bind( type, callback )`
+`.delegate( selector, type, callback )`
+
+`.bind( type, callback )`
 
 Adds an event listener.
 
@@ -135,16 +158,36 @@ and the event is canceled.
 	});
 ```
 
-### Cleanup
+Delegated event listeners could be used for elements that do not exist yet,
+and to avoid creating multiple event listeners, when one can suffice:
 
-`unbind( type, callback )`
+```js
+	//only one event handler for multiple <tr> elements
+	$('table').delegate('tr', 'click', function() {
+		alert('row clicked');
+	});
+	//it will work even for this one:
+	$('table').insertNode( document.createElement('tr') );
+```
+
+### Remove handlers
+
+`.off( type [, selector] [, callback])`
+
+`.undelegate( selector [, type] [, callback] )`
+
+`.unbind( [type] [, callback] )`
 
 Removes an event listener.
 
+If callback is not specified, all event listeners of type `type` are removed.
+
+If no type is specified either, **ALL** event listeners are removed.
+
 ### AJAX
 
-	`ajax( params )`
-	
+`.ajax( params )`
+
 Where params is a hash with the following optional keys:
 
 ```js
@@ -200,7 +243,7 @@ Or, a form!
 ```
 ```js
 	$('form').ajax(
-		'success' : { alert('form posted'); }
+		'success' : function(e) { alert('form posted'); }
 	);
 ```
 
@@ -211,8 +254,15 @@ Will submit a form via ajax. Form's `action` and `method` are used;
 
 Unlike JQuery, calling `$('#id')` will return **ONE** object, not an array with one element, nor a nodelist.
 
-`.text, .html, .class, .attr` and similar helper functions are not available, native DOM 
+Expanding objects is not being done via the `.prototype` property, but by brutally applying 
+each property to each object. This is much slower, but correct in terms of DOM.
+
+Only a small subset of JQuery functionality is provided: 
+
+`.text(), .html(), .class(), .attr()` and similar helper functions are not available, native DOM 
 methods should be used instead.
+
+`.unbind(event)`, event-maps, multiple event types, type namespaces and custom events are not supported. 
 
 ## Copying
 
