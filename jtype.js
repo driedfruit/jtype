@@ -242,7 +242,7 @@ var JType = {
 
 		each : function(calee) {
 			for (var i = 0; i < this.length; i++) {
-				if (! calee.call(this[i], i, this[i]) ) break;
+				if ( calee.call(this[i], i, this[i]) === false ) break;
 			}
 			return this;
 		},
