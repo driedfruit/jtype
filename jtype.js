@@ -143,10 +143,7 @@ var JType = {
 		},
 
 		each : function(calee) {
-			//this._call = calee;
-			//this._call();
-			//this._call = null;
-			calee.call(this);
+			calee.call(this, 0, this);
 			return this;
 		},
 
@@ -245,7 +242,7 @@ var JType = {
 
 		each : function(calee) {
 			for (var i = 0; i < this.length; i++) {
-				this[i].each(calee);
+				if (! calee.call(this[i], i, this[i]) ) break;
 			}
 			return this;
 		},
