@@ -1,41 +1,45 @@
 /* JType - a JQuery/Prototype simulation library 
  * License: 2-clause BSD
  */
-/*global document*/
+/*global document,window,XMLHttpRequest*/
 var JType = {
 
-	SelEng: function(selector, context) {
-		if (context) return context.querySelectorAll(selector); 
-		else return document.querySelectorAll(selector);
+	SelEng: function (selector, context) {
+		return context ? 
+			context.querySelectorAll(selector) :
+			document.querySelectorAll(selector);
 	},
 
-	domReady : 0,	// 0 - no, 1 - trigger w
+	domReady : 0,	// 0 - no, 1 - preparing, 2 - done
 	domCalees : [ ],
 
-	domLoad : function() {
-		if (JType.domReady != 0) return;
-		window.onload = function() {
-			if (JType.domReady == 2) return;
-			JType.domReady = 2;
-			for (var i in JType.domCalees) {
-				JType.domCalees[i]();
+	domLoad : function () {
+		if (JType.domReady === 0) {
+			window.onload = function () {
+				var i;
+				if (JType.domReady !== 2) { 
+					JType.domReady = 2;
+					for (i = 0; i < JType.domCalees.length; i++) {
+						JType.domCalees[i]();
+					}
+				}
 			}
-		};
-		if (document.addEventListener) 
-			document.addEventListener("DOMContentLoaded", window.onload, false);
-		JType.domReady = 1;
+			if (document.addEventListener) {
+				document.addEventListener("DOMContentLoaded", window.onload, false); }
+			JType.domReady = 1;
+		}
 	},
 
-	isChildOf : function(kid, probable_parent) {
+	isChildOf : function (kid, probable_parent) {
 		while (kid.parentNode) {	
-			if (kid.parentNode == probable_parent) return true;
+			if (kid.parentNode === probable_parent) return true;
 			kid = kid.parentNode;
 		}
 		return false;
 	},
 
 	iframesCounter : 0, 
-	ajaiObject : function(skip) {
+	ajaiObject : function (skip) {
 		var o = new Object();
 		o = Prototype(o, JType.JQueryAjaiPrototype);
 		o = Prototype(o, JType.JQueryAjaxPrototype);
@@ -43,7 +47,7 @@ var JType = {
 		return o;
 	},
 
-	ajaxObject : function() {
+	ajaxObject : function () {
 		var o = null;
 		if (window.XMLHttpRequest) { 
 			o = new XMLHttpRequest();
@@ -60,7 +64,7 @@ var JType = {
 		return o;
 	},
 
-	ajaxArguments : function(args) {
+	ajaxArguments : function (args) {
 		var str = ''; var sep = '';
 		for (var key in args) {
 			str = str + sep;
@@ -70,7 +74,7 @@ var JType = {
 		return str;
 	},
 
-	formArguments : function(form) {
+	formArguments : function (form) {
 		var i = 0; 
 		var inputs = JType.SelEng('input, textarea, select', form);
 		var args = { } ;//new Array();
@@ -90,14 +94,14 @@ var JType = {
 		};
 	},
 
-	ajaxForm : function(form) {
+	ajaxForm : function (form) {
 		var params = JType.formArguments(form);
 		params['url'] = form.getAttribute('action');
 		params['method'] =  form.method.toUpperCase();
 		return params;
 	},
 
-	ajaiSubmit : function(form, params) {
+	ajaiSubmit : function (form, params) {
 
 		var ajax = Prototype(JType.ajaiObject(0), params ); // Skip first iframe load
 		//ajax.note = param["note"];
@@ -119,7 +123,7 @@ var JType = {
 		return true;
 	},
 
-	ajaxSubmit : function(form, _params) {
+	ajaxSubmit : function (form, _params) {
 
 		var params = Prototype( JType.ajaxForm(form) , _params );
 
@@ -132,7 +136,7 @@ var JType = {
 		return false;
 	},
 
-	ajaxRun : function(url, method, args, callback, note, iframe) {
+	ajaxRun : function (url, method, args, callback, note, iframe) {
 
 		var ajax = Prototype((iframe ? JType.ajaiObject() : JType.ajaxObject()), { 
 			"url":url, "method":method, "args":args, "success":callback, "data":note } );
@@ -146,16 +150,16 @@ var JType = {
 
 	JQueryNodePrototype: {
 
-		register : function() {
+		register : function () {
 
 		},
 
-		each : function(calee) {
+		each : function (calee) {
 			calee.call(this, 0, this);
 			return this;
 		},
 
-		eventHandler: function(e, callback, selector) {
+		eventHandler: function (e, callback, selector) {
 			var objs = selector ? JType.SelEng(selector, this) : [ this ];
 			var ok = true;
 			for (i = 0; i < objs.length; i++) {
@@ -173,7 +177,7 @@ var JType = {
 			return ok;
 		},
 
-		uid : function() {
+		uid : function () {
 			var current = this.getAttribute('data-jtype-uid');
 			if (current) return current;
 			else current = JType.uids++;
@@ -181,7 +185,7 @@ var JType = {
 			return current;
 		},
 
-		on : function(type, middle_arg, callback) {
+		on : function (type, middle_arg, callback) {
 
 			var subselector = null;
 			if (typeof middle_arg === 'function') callback = middle_arg;
@@ -190,7 +194,7 @@ var JType = {
 			return this.delegate(subselector, type, callback);
 		},
 
-		off : function(type, middle_arg, callback) {
+		off : function (type, middle_arg, callback) {
 
 			var subselector = null;
 			if (typeof middle_arg === 'function') callback = middle_arg;
@@ -199,7 +203,7 @@ var JType = {
 			return this.undelegate(subselector, type, callback);
 		},
 
-		delegate : function(selector, type, callback) {
+		delegate : function (selector, type, callback) {
 			var useCapture = false;
 			var relay = this;
 			var func = function(e) {	relay.eventHandler(e, callback, selector)	};
@@ -216,7 +220,7 @@ var JType = {
 			return this;
 		},
 
-		undelegate : function(selector, type, callback) {
+		undelegate : function (selector, type, callback) {
 			var useCapture = false;
 			var func = null;
 			var uid = this.uid();
@@ -279,15 +283,15 @@ var JType = {
 			return this;
 		},
 
-		bind : function(type, callback) {
+		bind : function (type, callback) {
 			return this.delegate(null, type, callback);
 		},
 
-		unbind : function(type, callback) {
+		unbind : function (type, callback) {
 			return this.undelegate(null, type, callback);
 		},
 
-		ajax : function(params) {
+		ajax : function (params) {
 			params = params || { };
 			if (this.nodeName == 'FORM') {
 				return JType.ajaxSubmit(this, params);
@@ -303,63 +307,63 @@ var JType = {
 
 	JQueryListPrototype: {
 
-		register : function() {
+		register : function () {
 			for (var i = 0; i < this.length; i++) {
 				this[i] = Prototype(this[i], JType.JQueryNodePrototype);
 			}
 			return this;
 		},
 
-		each : function(calee) {
+		each : function (calee) {
 			for (var i = 0; i < this.length; i++) {
 				if ( calee.call(this[i], i, this[i]) === false ) break;
 			}
 			return this;
 		},
 
-		on : function(arg1, arg2, arg3) {
+		on : function (arg1, arg2, arg3) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].on(arg1, arg2, arg3);
 			}
 			return this;		
 		},
 
-		off : function(arg1, arg2, arg3) {
+		off : function (arg1, arg2, arg3) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].off(arg1, arg2, arg3);
 			}
 			return this;
 		},
 
-		delegate : function(selector, type, callback) {
+		delegate : function (selector, type, callback) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].bind(selector, type, callback);
 			}
 			return this;
 		},
 
-		undelegate : function(selector, type, callback) {
+		undelegate : function (selector, type, callback) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].undelegate(selector, type, callback);
 			}
 			return this;
 		},
 
-		bind : function(type, callback) {
+		bind : function (type, callback) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].bind(type, callback);
 			}
 			return this;
 		},
 
-		unbind : function(type, callback) {
+		unbind : function (type, callback) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].unbind(type, callback);
 			}
 			return this;
 		},
 
-		ajax : function(params) {
+		ajax : function (params) {
 			for (var i = 0; i < this.length; i++) {
 				this[i].ajax(params);
 			}
@@ -370,7 +374,7 @@ var JType = {
 
 	JQueryDocumentPrototype: {
 
-		ready: function(calee) {
+		ready: function (calee) {
 			if (JType.domReady == 2) {
 				calee();
 			} else {
@@ -380,7 +384,7 @@ var JType = {
 			return this;
 		},
 
-		ajax : function(params) {
+		ajax : function (params) {
 
 			var ajax = Prototype(	
 				(params["iframe"] ? JType.ajaiObject() : JType.ajaxObject()), params );
@@ -394,7 +398,7 @@ var JType = {
 
 	JQueryAjaxPrototype: {
 		
-		onreadystatechange : function() {
+		onreadystatechange : function () {
 			if (this.readyState == 4) {
 				if (this.success) {
 					if (this.json == true) {
@@ -414,7 +418,7 @@ var JType = {
 			}
 		},
 
-		request : function() {
+		request : function () {
 			if (this.method === 'POST') {
 				this.open('POST', this.url, true);
 				this.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
@@ -434,7 +438,7 @@ var JType = {
 
 		ref: null, // iframe object
 
-		open : function(method, url, flag) {
+		open : function (method, url, flag) {
 			var name = 'axif'+(JType.iframesCounter++);
 			var i = document.createElement('IFRAME'); 
 			var o = this;
@@ -458,7 +462,7 @@ var JType = {
 			};
 		},
 
-		send : function() {
+		send : function () {
 			//var o = this;
 			var i = this.ref;
 			i.src = this.url; 
@@ -482,13 +486,13 @@ if (!window.console) {
 	}
 }
 
-function $(arg, arg2) {
+function $ (arg, arg2) {
 
 	return JQuery(arg, arg2);
 
 }
 
-function JQuery(arg, arg2) {
+function JQuery (arg, arg2) {
 	console.log("JQuery with arg " + typeof arg, arg);
 	if (arg === document) {
 		return Prototype(arg, JType.JQueryDocumentPrototype);
@@ -521,13 +525,13 @@ function JQuery(arg, arg2) {
 
 }
 
-function $$(arg, proto) {
+function $$ (arg, proto) {
 
 	return Prototype(arg, proto);
 
 }
 
-function Prototype(arg, proto) {
+function Prototype (arg, proto) {
 
 	/* List of objects */
 	if (arg.length) {
