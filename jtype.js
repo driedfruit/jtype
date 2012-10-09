@@ -1,7 +1,7 @@
 /* JType - a JQuery/Prototype simulation library 
  * License: 2-clause BSD
  */
-
+/*global document*/
 var JType = {
 
 	SelEng: function(selector, context) {
@@ -24,6 +24,14 @@ var JType = {
 		if (document.addEventListener) 
 			document.addEventListener("DOMContentLoaded", window.onload, false);
 		JType.domReady = 1;
+	},
+
+	isChildOf : function(kid, probable_parent) {
+		while (kid.parentNode) {	
+			if (kid.parentNode == probable_parent) return true;
+			kid = kid.parentNode;
+		}
+		return false;
 	},
 
 	iframesCounter : 0, 
@@ -147,19 +155,22 @@ var JType = {
 			return this;
 		},
 
-		eventHandler: function(e, callback) {
-			//this._call = callback;
-			//var keep_event = this._call();
-			//this._call = null;
-			var keep_event = callback.call(this, e);
-			if (keep_event == false) {
-				if (e.stopPropagation) e.stopPropagation();
-				else e.cancelBubble = true;
-				if (e.preventDefault) e.preventDefault(); 
-				else e.returnValue = false;
-				return false;
+		eventHandler: function(e, callback, selector) {
+			var objs = selector ? JType.SelEng(selector, this) : [ this ];
+			var ok = true;
+			for (i = 0; i < objs.length; i++) {
+				//if (e.target != objs[i]) continue;
+				if (selector && !JType.isChildOf(e.target, objs[i])) continue;
+				var keep_event = callback.call(objs[i], e);
+				if (keep_event == false) {
+					if (e.stopPropagation) e.stopPropagation();
+					else e.cancelBubble = true;
+					if (e.preventDefault) e.preventDefault(); 
+					else e.returnValue = false;
+					ok = false;
+				}
 			}
-			return true;
+			return ok;
 		},
 
 		uid : function() {
@@ -170,14 +181,32 @@ var JType = {
 			return current;
 		},
 
-		bind : function(type, callback) {
+		on : function(type, middle_arg, callback) {
+
+			var subselector = null;
+			if (typeof middle_arg === 'function') callback = middle_arg;
+			if (typeof middle_arg === 'string') subselector = middle_arg;		
+
+			return this.delegate(subselector, type, callback);
+		},
+
+		off : function(type, middle_arg, callback) {
+
+			var subselector = null;
+			if (typeof middle_arg === 'function') callback = middle_arg;
+			if (typeof middle_arg === 'string') subselector = middle_arg;		
+
+			return this.undelegate(subselector, type, callback);
+		},
+
+		delegate : function(selector, type, callback) {
 			var useCapture = false;
 			var relay = this;
-			var func = function(e) {	relay.eventHandler(e, callback)	};
+			var func = function(e) {	relay.eventHandler(e, callback, selector)	};
 			var uid = this.uid();
 			if (!JType.binds[uid]) JType.binds[uid] = { };
 			if (!JType.binds[uid][type]) JType.binds[uid][type] = [ ];
-			JType.binds[uid][type].push({ "real":callback, "wrapped":func});
+			JType.binds[uid][type].push({ "real":callback, "wrapped":func, "selector":selector});
 			// W3C listeners?
 			if (this.addEventListener)
 				this.addEventListener(type, func, useCapture);
@@ -187,7 +216,7 @@ var JType = {
 			return this;
 		},
 
-		unbind : function(type, callback) {
+		undelegate : function(selector, type, callback) {
 			var useCapture = false;
 			var func = null;
 			var uid = this.uid();
@@ -195,9 +224,42 @@ var JType = {
 				console.log("Cant see any binds for uid " + uid);
 				return false;
 			}
+			// 3 loops instead of one, code duplication, but less branching
+			if (!type) {
+				// Variation 1 -- nothing is specified, remove ALL events
+				for (var ltype in JType.binds[uid]) {
+					if (!JType.binds[uid][ltype]) continue;
+					for (var i = 0; i < JType.binds[uid][ltype].length; i++) {
+						var bind = JType.binds[uid][ltype][i];
+						var lfunc = bind.wrapped;
+						if (selector && selector != bind.selector) continue;
+						if (this.removeEventListener)
+							this.removeEventListener(ltype, lfunc, useCapture);
+						else if (obj.detachEvent) // IE :( 
+							this.detachEvent('on' + ltype, lfunc);
+					}
+				}
+				return this;
+			} else if (!callback) {
+				//Variation 2 -- callback not specified, remove all 'type' events
+				if (JType.binds[uid][type])
+				for (var i = 0; i < JType.binds[uid][type].length; i++) {
+					var bind = JType.binds[uid][type][i];
+					var lfunc = bind.wrapped;
+					if (selector && selector != bind.selector) continue;
+					if (this.removeEventListener) 
+						this.removeEventListener(type, lfunc, useCapture);
+					else if (obj.detachEvent) // IE :(
+						this.detachEvent('on' + type, lfunc);
+				}
+				return this;
+			}
+			// Variation 3 -- both type and callback are specified
+			if (JType.binds[uid][type])			
 			for (var i = 0; i < JType.binds[uid][type].length; i++) {
 				var bind = JType.binds[uid][type][i];
 				//console.log("Event", type, i, bind, bind.real, callback);
+				if (selector && selector != bind.selector) continue;
 				if (bind.real === callback) {
 					func = bind.wrapped;
 					break;
@@ -215,6 +277,14 @@ var JType = {
 				this.detachEvent('on' + type, func);
 
 			return this;
+		},
+
+		bind : function(type, callback) {
+			return this.delegate(null, type, callback);
+		},
+
+		unbind : function(type, callback) {
+			return this.undelegate(null, type, callback);
 		},
 
 		ajax : function(params) {
@@ -243,6 +313,34 @@ var JType = {
 		each : function(calee) {
 			for (var i = 0; i < this.length; i++) {
 				if ( calee.call(this[i], i, this[i]) === false ) break;
+			}
+			return this;
+		},
+
+		on : function(arg1, arg2, arg3) {
+			for (var i = 0; i < this.length; i++) {
+				this[i].on(arg1, arg2, arg3);
+			}
+			return this;		
+		},
+
+		off : function(arg1, arg2, arg3) {
+			for (var i = 0; i < this.length; i++) {
+				this[i].off(arg1, arg2, arg3);
+			}
+			return this;
+		},
+
+		delegate : function(selector, type, callback) {
+			for (var i = 0; i < this.length; i++) {
+				this[i].bind(selector, type, callback);
+			}
+			return this;
+		},
+
+		undelegate : function(selector, type, callback) {
+			for (var i = 0; i < this.length; i++) {
+				this[i].undelegate(selector, type, callback);
 			}
 			return this;
 		},
