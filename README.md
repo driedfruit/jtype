@@ -238,7 +238,7 @@ Or, a form!
 
 ```html
 	<form action='target/backend/url' method='post'>
-		<input type='name' />
+		<input type='text' name='arg1' />
 	</form>
 ```
 ```js
