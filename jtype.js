@@ -31,6 +31,7 @@ var JType = {
 	},
 
 	isChildOf : function (kid, probable_parent) {
+		if (kid == probable_parent) return true;
 		while (kid.parentNode) {	
 			if (kid.parentNode === probable_parent) return true;
 			kid = kid.parentNode;
