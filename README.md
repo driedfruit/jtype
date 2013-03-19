@@ -4,7 +4,8 @@ A tiny javascript framework, that borrows it's syntax from JQuery and
 Prototype.
 
 In only 13kb (about 550 lines of code), it can provide an onDOMload method, 
-AJAX (both true and iframe-based), `.each` iterator and an event binder/unbinder. 
+AJAX (both true and iframe-based), `.each` iterator and an event handler
+manager. 
 
 JType should also be able to "emulate" JQuery, for cases when you need
 to quickly test some JQuery-based code snippet, but don't want to add the extra
