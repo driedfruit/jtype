@@ -240,7 +240,7 @@ var JType = {
 						if (selector && selector != bind.selector) continue;
 						if (this.removeEventListener)
 							this.removeEventListener(ltype, lfunc, useCapture);
-						else if (obj.detachEvent) // IE :( 
+						else if (this.detachEvent) // IE :( 
 							this.detachEvent('on' + ltype, lfunc);
 					}
 				}
@@ -254,7 +254,7 @@ var JType = {
 					if (selector && selector != bind.selector) continue;
 					if (this.removeEventListener) 
 						this.removeEventListener(type, lfunc, useCapture);
-					else if (obj.detachEvent) // IE :(
+					else if (this.detachEvent) // IE :(
 						this.detachEvent('on' + type, lfunc);
 				}
 				return this;
@@ -278,7 +278,7 @@ var JType = {
 			if (this.removeEventListener) 
 				this.removeEventListener(type, func, useCapture);
 			// IE-style listeners?
-			else if (obj.detachEvent) 
+			else if (this.detachEvent) 
 				this.detachEvent('on' + type, func);
 
 			return this;
