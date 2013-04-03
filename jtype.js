@@ -338,7 +338,7 @@ var JType = {
 
 		delegate : function (selector, type, callback) {
 			for (var i = 0; i < this.length; i++) {
-				this[i].bind(selector, type, callback);
+				this[i].delegate(selector, type, callback);
 			}
 			return this;
 		},
