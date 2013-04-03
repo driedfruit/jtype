@@ -500,14 +500,12 @@ function JQuery (arg, arg2) {
 	}
 
 	else if (typeof arg === 'object') {
-		return Prototype(arg, JType.JQueryNodePrototype);
+		return [ Prototype(arg, JType.JQueryNodePrototype) ];
 	} 
 
 	else if (typeof arg === 'string') {
 
 		var o = JType.SelEng( arg, arg2 );
-//console.log(arg, arg2, o);
-		if (o.length == 1) return Prototype( o[0], JType.JQueryNodePrototype );
 
 		return Prototype( o, JType.JQueryListPrototype );
 	}

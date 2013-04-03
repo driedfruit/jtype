@@ -75,8 +75,8 @@ This function could be used multiple times.
 
 _Yes, there's a function called `JQuery` (sorry about that), and an alias, called `$`._
 
-Returns an array of items (or one item!) selected by `selector`, from optional `base`
-element. If `base` is not specified, `document` is used.
+Returns an array of items selected by `selector`, from optional `base` element. 
+If `base` is not specified, `document` is used.
 
 ```js
 	//collect all A elements from the document
@@ -252,8 +252,6 @@ Will submit a form via ajax. Form's `action` and `method` are used;
 `args` are collected from the input fields.
 
 ## Caveats
-
-Unlike JQuery, calling `$('#id')` will return **ONE** object, not an array with one element, nor a nodelist.
 
 Expanding objects is not being done via the `.prototype` property, but by brutally applying 
 each property to each object. This is much slower, but correct in terms of DOM.
