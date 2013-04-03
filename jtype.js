@@ -500,7 +500,7 @@ function JQuery (arg, arg2) {
 	}
 
 	else if (typeof arg === 'object') {
-		return [ Prototype(arg, JType.JQueryNodePrototype) ];
+		return Prototype( [ arg ], JType.JQueryListPrototype );
 	} 
 
 	else if (typeof arg === 'string') {
