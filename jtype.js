@@ -39,6 +39,20 @@ var JType = {
 		return false;
 	},
 
+	createNode : function(html) {
+		var obj = document.createElement('div');
+		obj.innerHTML = html;
+
+		var arr = [ ];
+		var i = 0;
+		while (obj.childNodes.length) {
+			arr[ i ] = obj.removeChild( obj.firstChild );
+			i++;
+		}
+
+		return arr;
+	},
+
 	iframesCounter : 0, 
 	ajaiObject : function (skip) {
 		var o = new Object();
@@ -302,6 +316,19 @@ var JType = {
 			}
 			JType.ajaxRun(params['url'], params['method'], params['args'], params['success'], params['data']);
 			return this;
+		},
+
+		append : function (arg) {
+			if (typeof arg === 'object' && !arg.length) {
+				arg = [ arg ];
+			}
+			else if (typeof arg === 'string') {
+				arg = JType.createNode( arg );
+			}
+			for (var i = 0; i < arg.length; i++) {
+				this.appendChild( arg[i] );
+			}
+			return this;
 		}
 
 	},
@@ -369,8 +396,14 @@ var JType = {
 				this[i].ajax(params);
 			}
 			return this;
-		}
+		},
 
+		append : function (arg) {
+			for (var i = 0; i < this.length; i++) {
+				this[i].append(arg);
+			}
+			return this;
+		}
 	},
 
 	JQueryDocumentPrototype: {
@@ -500,14 +533,17 @@ function JQuery (arg, arg2) {
 	}
 
 	else if (typeof arg === 'object') {
+		//wrap object
 		return Prototype( [ arg ], JType.JQueryListPrototype );
 	} 
 
 	else if (typeof arg === 'string') {
-
-		var o = JType.SelEng( arg, arg2 );
-
-		return Prototype( o, JType.JQueryListPrototype );
+		//create
+		if (arg.substr(0, 1) == '<' && arg.substr(-1) == '>') {
+			return Prototype( JType.createNode( arg ), JType.JQueryListPrototype );
+		}
+		//select
+		return Prototype( JType.SelEng( arg, arg2 ), JType.JQueryListPrototype );
 	}
 
 	else if (typeof arg === 'function') {

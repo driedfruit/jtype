@@ -3,7 +3,7 @@
 A tiny javascript framework, that borrows it's syntax from JQuery and 
 Prototype.
 
-In only 13kb (about 550 lines of code), it can provide an onDOMload method, 
+In only 14kb (about 600 lines of code), it can provide an onDOMload method, 
 AJAX (both true and iframe-based), `.each` iterator and an event handler
 manager. 
 
@@ -83,7 +83,16 @@ If `base` is not specified, `document` is used.
 	var links = $('a');
 ```
 
-### Extend	
+#### Create
+
+Creates new DOM elements by taking HTML string for an argument.
+
+```js
+	//create two A elements
+	var links = $('<a/><a/>');
+```
+
+### Extend
 
 `$$( object, prototype )`
 
@@ -184,6 +193,13 @@ Removes an event listener.
 If callback is not specified, all event listeners of type `type` are removed.
 
 If no type is specified either, **ALL** event listeners are removed.
+
+### Append
+
+`.append( mixed )`
+
+Calls `.appendChild` for each element in a passed array, for passed object, or
+for all elements created by a passed string.
 
 ### AJAX
 
