@@ -1,6 +1,13 @@
 /* JType - a JQuery/Prototype simulation library 
  * License: 2-clause BSD
  */
+/* IE-specific hacks used:
+  substr can't take negative values: https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String/substr
+  .name attr can't be set correctly: http://stackoverflow.com/questions/2105815/weird-behaviour-of-iframe-name-attribute-set-by-jquery-in-ie
+  iframe onload uses a dummy function: http://stackoverflow.com/questions/4334520/load-event-for-iframe-not-fired-in-ie
+  .attachEvent instead of addEventListener.
+  Other then that, it's all standarts and goodness.
+*/
 /*global document,window,XMLHttpRequest*/
 var JType = {
 
