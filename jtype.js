@@ -96,6 +96,15 @@ var JType = {
 		return str;
 	},
 
+	formdataArguments : function (args) {
+		var fd = new FormData();
+		for (var key in args) {
+			fd.append(key, args[key]);
+		}
+		return fd;
+	},
+
+
 	formArguments : function (form) {
 		var i = 0; 
 		var inputs = JType.SelEng('input, textarea, select', form);
@@ -466,10 +475,15 @@ var JType = {
 		request : function () {
 			if (this.method === 'POST') {
 				this.open('POST', this.url, true);
-				this.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 				if (this.json == true)
 					this.setRequestHeader('Accept','application/json');
-				this.send(JType.ajaxArguments(this.args));
+				if (window.FormData) {
+					this.send(JType.formdataArguments(this.args));
+				}
+				else {
+					this.setRequestHeader('Codntent-Type','application/x-www-form-urlencoded');
+					this.send(JType.ajaxArguments(this.args));
+				}
 			} else {
 				var url = this.url;
 				if (this.args) url = url + '?' + JType.ajaxArguments(this.args);
