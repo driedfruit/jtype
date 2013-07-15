@@ -86,7 +86,7 @@ var JType = {
 		return o;
 	},
 
-	ajaxArguments : function (args) {
+	urlencodeArguments : function (args) {
 		var str = ''; var sep = '';
 		for (var key in args) {
 			str = str + sep;
@@ -482,11 +482,11 @@ var JType = {
 				}
 				else {
 					this.setRequestHeader('Codntent-Type','application/x-www-form-urlencoded');
-					this.send(JType.ajaxArguments(this.args));
+					this.send(JType.urlencodeArguments(this.args));
 				}
 			} else {
 				var url = this.url;
-				if (this.args) url = url + '?' + JType.ajaxArguments(this.args);
+				if (this.args) url = url + '?' + JType.urlencodeArguments(this.args);
 				this.open('GET', url, true);
 				if (this.json == true)
 					this.setRequestHeader('Accept','application/json');
