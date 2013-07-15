@@ -456,16 +456,18 @@ var JType = {
 			if (this.method === 'POST') {
 				this.open('POST', this.url, true);
 				this.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-
+				if (this.json == true)
+					this.setRequestHeader('Accept','application/json');
 				this.send(JType.ajaxArguments(this.args));
 			} else {
 				var url = this.url;
 				if (this.args) url = url + '?' + JType.ajaxArguments(this.args);
 				this.open('GET', url, true);
+				if (this.json == true)
+					this.setRequestHeader('Accept','application/json');
 				this.send(null);
 			}
 		}
-
 	},
 
 	JQueryAjaiPrototype: {
