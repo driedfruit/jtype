@@ -481,7 +481,7 @@ var JType = {
 					this.send(JType.formdataArguments(this.args));
 				}
 				else {
-					this.setRequestHeader('Codntent-Type','application/x-www-form-urlencoded');
+					this.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 					this.send(JType.urlencodeArguments(this.args));
 				}
 			} else {
