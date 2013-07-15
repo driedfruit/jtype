@@ -177,7 +177,7 @@ and to avoid creating multiple event listeners, when one can suffice:
 		alert('row clicked');
 	});
 	//it will work even for this one:
-	$('table').insertNode( document.createElement('tr') );
+	$('table')[0].appendChild( document.createElement('tr') );
 ```
 
 ### Remove handlers
