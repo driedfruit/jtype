@@ -555,7 +555,7 @@ function JQuery (arg, arg2) {
 
 	else if (typeof arg === 'string') {
 		//create
-		if (arg.substr(0, 1) == '<' && arg.substr(-1) == '>') {
+		if (arg.substr(0, 1) == '<' && arg.substr(arg.length-1, 1) == '>') { //IE substr negative :/
 			return Prototype( JType.createNode( arg ), JType.JQueryListPrototype );
 		}
 		//select
