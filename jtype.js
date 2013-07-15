@@ -117,24 +117,27 @@ var JType = {
 	},
 
 	ajaiSubmit : function (form, params) {
-
 		var ajax = Prototype(JType.ajaiObject(0), params ); // Skip first iframe load
 		//ajax.note = param["note"];
 		//ajax.onreadystatechange = params["success"];//callback;
 		//ajax.open(obj.method, obj.getAttribute('action'), true);
 		//ajax_req.send(null);
-		ajax.request();
+		//ajax.request();
+		ajax.open();
 
-		var original_action = form.getAttribute('action');
-		var original_method = form.method;
-		var original_target = form.target;
+		ajax.form_original = { 
+			"action": form.getAttribute('action'),
+			"method": form.method,
+			"target": form.target,
+		}; 
+
 		form.action = ajax.url;
 		form.method = ajax.method;
 		form.target = ajax.ref.name; // ref is an iframe object
+
+		ajax.ref_form = form;
+		
 		form.submit();
-		form.action = original_action;
-		form.method = original_method;
-		form.target = original_target;
 		return true;
 	},
 
@@ -476,35 +479,45 @@ var JType = {
 
 		open : function (method, url, flag) {
 			var name = 'axif'+(JType.iframesCounter++);
-			var i = document.createElement('IFRAME'); 
 			var o = this;
-			i.id = name; i.name = name;
+			//NOTE: this *sane* method doesn't work in <= IE7
+			//var i = document.createElement('IFRAME'); 
+			//i.id = name; i.name = name;
+			//i.src = 'about:blank';
+			window.dummy_for_ie7 = function() { }
+			var i = $('<iframe id="'+name+'" name="'+name+'" src="about:blank" onload="dummy_for_ie7" />')[0];
+			
 			//i.style.display = 'none';
 			this.ref = i;
 			this.loaded = function() {
-				//alert("skip:"+o.skip);
 				if (o.skip) { o.skip--; return; }
 				if (i.contentDocument) { var d = i.contentDocument;	}
 				else if (i.contentWindow) { var d = i.contentWindow.document; }
 				else return;//if (d.location.href == 'about:blank') { return; }
+				if (d.location.href == i.src) { return; }
 
 				o.readyState = 4;
 				o.responseText = d.body.innerHTML;
 				o.onreadystatechange(o.data);
 
+				if (o.ref_form) {
+					o.ref_form.action = o.form_original['action'];
+					o.ref_form.method = o.form_original['method'];
+					o.ref_form.target = o.form_original['target'];
+				}
+
 				$(i).unbind('load', o.loaded);
 				document.body.removeChild(i);
 				delete o;
 			};
+			$(i).bind('load', this.loaded);
+			document.body.appendChild(i);
 		},
 
 		send : function () {
 			//var o = this;
 			var i = this.ref;
 			i.src = this.url; 
-
-			$(i).bind('load', this.loaded);
-			document.body.appendChild(i);
 		},
 		
 		setRequestHeader: function(x,y) {
