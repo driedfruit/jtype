@@ -190,6 +190,7 @@ var JType = {
 					if (e.preventDefault) e.preventDefault(); 
 					else e.returnValue = false;
 					ok = false;
+					break;
 				}
 			}
 			return ok;
@@ -224,7 +225,7 @@ var JType = {
 		delegate : function (selector, type, callback) {
 			var useCapture = false;
 			var relay = this;
-			var func = function(e) {	relay.eventHandler(e, callback, selector)	};
+			var func = function(e) {	return relay.eventHandler(e, callback, selector)	};
 			var uid = this.uid();
 			if (!JType.binds[uid]) JType.binds[uid] = { };
 			if (!JType.binds[uid][type]) JType.binds[uid][type] = [ ];
