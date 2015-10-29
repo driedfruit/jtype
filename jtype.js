@@ -747,7 +747,13 @@ function Prototype (arg, proto) {
 
 	for (var key in proto) {
 
-		arg[key] = proto[key];
+		try {
+			arg[key] = proto[key];
+		}
+		catch (e) {
+			console.log("Unable to set ", arg);
+			arg[key] = null;
+		}
 
 		//console.log(key + " = "+proto[key]);
 
