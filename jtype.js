@@ -266,7 +266,13 @@ var JType = {
 		return ok;
 	},
 
-		},
+	classRegexps: { },
+	classRegExp: function (name) {
+		if (!classRegExps[name]) {
+			classRegExps[name] = new RegExp('(\\s|^)'+name+'(\\s|$)');
+		}
+		return classRegExps[name];
+	},
 
 	JQueryNodePrototype: {
 
@@ -419,40 +425,35 @@ var JType = {
 			return this;
 		},
 
-		on : function (arg1, arg2, arg3) {
-			for (var i = 0; i < this.length; i++) {
-				this[i].on(arg1, arg2, arg3);
-			}
-			return this;		
+		hasClass: function (name) {
+			var re = JType.classRegExp(name);
+			return this.className.search(re) == -1 ? false : true;
 		},
-
-		off : function (arg1, arg2, arg3) {
-			for (var i = 0; i < this.length; i++) {
-				this[i].off(arg1, arg2, arg3);
-			}
+		addClass: function (name) {
+			var _rm = JType.JQueryNodePrototype.removeClass
+			this.className = _rm(this, name) + ' ' + name;
+			return this;
+		},
+		removeClass: function (name) {
+			var re = JType.classRegExp(name);
+			this.className = this.className.replace(re, '');
 			return this;
 		},
 
-		delegate : function (selector, type, callback) {
-			for (var i = 0; i < this.length; i++) {
-				this[i].delegate(selector, type, callback);
-			}
-			return this;
+		matches: function (selector, node) {
+			node = node || this;
+			return JType.MatchEng(node, selector);
 		},
 
-		undelegate : function (selector, type, callback) {
-			for (var i = 0; i < this.length; i++) {
-				this[i].undelegate(selector, type, callback);
+		closest: function (selector, node) {
+			var _matches = JType.JQueryNodePrototype.matches;
+			node = node || this;
+			while (node) {
+				if (_matches(selector, node)) return node;
+				node = node.parentNode;
 			}
-			return this;
-		},
-
-		bind : function (type, callback) {
-			for (var i = 0; i < this.length; i++) {
-				this[i].bind(type, callback);
-			}
-			return this;
-		},
+			return false;
+		}
 
 	},
 
