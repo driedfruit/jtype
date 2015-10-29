@@ -6,7 +6,7 @@
   .name attr can't be set correctly: http://stackoverflow.com/questions/2105815/weird-behaviour-of-iframe-name-attribute-set-by-jquery-in-ie
   iframe onload uses a dummy function: http://stackoverflow.com/questions/4334520/load-event-for-iframe-not-fired-in-ie
   .attachEvent instead of addEventListener.
-  Other then that, it's all standarts and goodness.
+  Other than that, it's all standards and goodness.
 */
 /*global document,window,XMLHttpRequest*/
 var JType = {
@@ -117,9 +117,9 @@ var JType = {
 
 	ajaxObject : function () {
 		var o = null;
-		if (window.XMLHttpRequest) { 
+		if (window.XMLHttpRequest) {
 			o = new XMLHttpRequest();
-		} else if (window.ActiveXObject) { 
+		} else if (window.ActiveXObject) {
 			try {
 				o = new ActiveXObject('Msxml2.XMLHTTP');
 			} catch (e) {
@@ -310,7 +310,7 @@ var JType = {
 
 			var subselector = null;
 			if (typeof middle_arg === 'function') callback = middle_arg;
-			if (typeof middle_arg === 'string') subselector = middle_arg;		
+			if (typeof middle_arg === 'string') subselector = middle_arg;
 
 			return JType.JQueryNodePrototype.delegate.call(this, subselector, type, callback);
 		},
@@ -319,7 +319,7 @@ var JType = {
 
 			var subselector = null;
 			if (typeof middle_arg === 'function') callback = middle_arg;
-			if (typeof middle_arg === 'string') subselector = middle_arg;		
+			if (typeof middle_arg === 'string') subselector = middle_arg;
 
 			return JType.JQueryNodePrototype.undelegate.call(this, subselector, type, callback);
 		},
@@ -380,7 +380,7 @@ var JType = {
 				return this;
 			}
 			// Variation 3 -- both type and callback are specified
-			if (JType.binds[uid][type])			
+			if (JType.binds[uid][type])
 			for (var i = 0; i < JType.binds[uid][type].length; i++) {
 				var bind = JType.binds[uid][type][i];
 				//console.log("Event", type, i, bind, bind.real, callback);
@@ -395,10 +395,10 @@ var JType = {
 				return false;
 			}
 			// W3C listeners?
-			if (this.removeEventListener) 
+			if (this.removeEventListener)
 				this.removeEventListener(type, func, useCapture);
 			// IE-style listeners?
-			else if (this.detachEvent) 
+			else if (this.detachEvent)
 				this.detachEvent('on' + type, func);
 
 			return this;
@@ -419,7 +419,7 @@ var JType = {
 				return this;
 			}
 			if (this.nodeName == 'A' && !params['url']) {
-				params['url'] = this.getAttribute('href'); 
+				params['url'] = this.getAttribute('href');
 			}
 			JType.ajaxRun(params);
 			return this;
@@ -735,8 +735,8 @@ function Prototype (arg, proto) {
 	if (arg.length) {
 		for (var i in arg) {
 			//alert('one object is ' + arg[i]);
-			//Prototype(arg, proto);		
-		}	
+			//Prototype(arg, proto);
+		}
 	}
 
 //	if (arg.length == 1) {
@@ -761,7 +761,7 @@ function Prototype (arg, proto) {
 
 	if (proto.register && typeof proto.register === 'function') {
 
-		arg.register();	
+		arg.register();
 
 	}
 
