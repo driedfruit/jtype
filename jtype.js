@@ -20,11 +20,16 @@ var JType = {
 	domReady : 0,	// 0 - no, 1 - preparing, 2 - done
 	domCalees : [ ],
 
-	domLoad : function () {
+	domLoad : function (callee) {
+		if (JType.domReady == 2) {
+			callee();
+		} else {
+			JType.domCalees.push(callee);
+		}
 		if (JType.domReady === 0) {
 			window.onload = function () {
 				var i;
-				if (JType.domReady !== 2) { 
+				if (JType.domReady !== 2) {
 					JType.domReady = 2;
 					for (i = 0; i < JType.domCalees.length; i++) {
 						JType.domCalees[i]();
