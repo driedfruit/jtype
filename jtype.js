@@ -16,6 +16,19 @@ var JType = {
 			context.querySelectorAll(selector) :
 			document.querySelectorAll(selector);
 	},
+	MatchEng: function (node, selector) {
+		if ("matches" in node) return node.matches(selector);
+		else if ("matchesSelector" in node) return node.matchesSelector(selector);
+		else if ("webkitMatchesSelector" in node) return node.webkitMatchesSelector(selector);
+		else if ("mozMatchesSelector" in node) return node.mozMatchesSelector(selector);
+		else if ("msMatchesSelector" in node) return node.msMatchesSelector(selector);
+		/* Use SelEng to verify selector somehow :( This is rather expensive... */
+		var matches = JType.SelEng(selector, node.parentNode);
+		for (var i = 0; i < matches.length; i++) {
+			if (matches[i] == node) return true;
+		}
+		return false;
+	},
 
 	domReady : 0,	// 0 - no, 1 - preparing, 2 - done
 	domCalees : [ ],
@@ -670,14 +683,6 @@ var JType = {
 
 };
 
-if (!window.console) {
-	console = {
-		"log": function (a) {
-			//alert(a);
-		} 
-	}
-}
-
 function $ (arg, arg2) {
 
 	return JQuery(arg, arg2);
@@ -685,7 +690,7 @@ function $ (arg, arg2) {
 }
 
 function JQuery (arg, arg2) {
-	console.log("JQuery with arg " + typeof arg, arg);
+	//console.log("JQuery with arg " + typeof arg, arg);
 	if (arg === document) {
 		return Prototype(arg, JType.JQueryDocumentPrototype);
 	}
@@ -757,3 +762,24 @@ function Prototype (arg, proto) {
 	return arg;
 }
 
+if (!window.console) {
+	console = {
+		"log": function (a) {
+			//alert(a);
+		}
+	}
+}
+
+if ("classList" in document) {
+	JType.JQueryNodePrototype.addClass = function(name) {
+		this.classList.add(name); return this;
+	}
+	JType.JQueryNodePrototype.hasClass = function(name) {
+		return this.classList.has(name);
+	}
+	JType.JQueryNodePrototype.removeClass = function(name) {
+		this.classList.remove(name); return this;
+	}
+}
+
+JType.prepareList();

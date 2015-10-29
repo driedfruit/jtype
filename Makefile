@@ -9,8 +9,9 @@ qsa:
 
 sizzle:
 	@cat jtype.js > jtype-$@-$(VERSION).js
-	@cat seleng/sizzle/sizzle.js >> jtype-$@-$(VERSION).js
+	@cat seleng/sizzle/src/sizzle.js >> jtype-$@-$(VERSION).js
 	@echo "JType.SelEng = Sizzle" >> jtype-$@-$(VERSION).js
+	@echo "JType.MatchEng = Sizzle.matchesSelector" >> jtype-$@-$(VERSION).js
 	@echo "Wrote jtype-$@-$(VERSION).js"
 
 nwmatcher:
